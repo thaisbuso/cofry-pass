@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/widgets/cofry_widgets.dart';
+import '../../../theme/app_theme.dart';
 import '../../auth/data/auth_service.dart';
 import '../../auth/presentation/login_page.dart';
 import '../data/vault_memory_repository.dart';
@@ -29,9 +31,7 @@ class _VaultHomePageState extends State<VaultHomePage> {
 
   Future<void> _loadItems() async {
     final loadedItems = await _repository.getItems();
-
     if (!mounted) return;
-
     setState(() {
       items = loadedItems;
       _loading = false;
@@ -41,39 +41,25 @@ class _VaultHomePageState extends State<VaultHomePage> {
   Future<void> _goToAddItem() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const AddVaultItemPage(),
-      ),
+      MaterialPageRoute(builder: (_) => const AddVaultItemPage()),
     );
-
-    if (result == true) {
-      await _loadItems();
-    }
+    if (result == true) await _loadItems();
   }
 
   Future<void> _goToDetails(VaultItem item) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => VaultItemDetailsPage(item: item),
-      ),
+      MaterialPageRoute(builder: (_) => VaultItemDetailsPage(item: item)),
     );
-
-    if (result == true) {
-      await _loadItems();
-    }
+    if (result == true) await _loadItems();
   }
 
   Future<void> _logout() async {
     await _authService.signOut();
-
     if (!mounted) return;
-
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (_) => const LoginPage(),
-      ),
+      MaterialPageRoute(builder: (_) => const LoginPage()),
       (route) => false,
     );
   }
@@ -82,42 +68,139 @@ class _VaultHomePageState extends State<VaultHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meu cofre'),
+        title: Row(
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withAlpha(30),
+                borderRadius: BorderRadius.circular(7),
+              ),
+              child: const Icon(
+                Icons.shield_rounded,
+                size: 15,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Text('Cofry Pass'),
+          ],
+        ),
         actions: [
           IconButton(
             onPressed: _logout,
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout_rounded, size: 20),
             tooltip: 'Sair',
+          ),
+          const SizedBox(width: 4),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 1,
+            color: AppColors.border,
+          ),
+        ),
+      ),
+      body: _loading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : items.isEmpty
+              ? const EmptyVaultState()
+              : _buildList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _goToAddItem,
+        tooltip: 'Adicionar item',
+        child: const Icon(Icons.add_rounded),
+      ),
+    );
+  }
+
+  Widget _buildList() {
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 96),
+      itemCount: items.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) return _buildListHeader();
+        final item = items[index - 1];
+        return _buildItemCard(item);
+      },
+    );
+  }
+
+  Widget _buildListHeader() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Text(
+            '${items.length} ${items.length == 1 ? 'item' : 'itens'}',
+            style: const TextStyle(
+              color: AppColors.muted,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : items.isEmpty
-              ? const Center(
-                  child: Text('Nenhum item salvo ainda'),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = items[index];
+    );
+  }
 
-                    return Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.lock),
-                        title: Text(item.title),
-                        subtitle: const Text('Dados protegidos'),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => _goToDetails(item),
+  Widget _buildItemCard(VaultItem item) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: () => _goToDetails(item),
+          borderRadius: BorderRadius.circular(14),
+          splashColor: AppColors.primary.withAlpha(20),
+          highlightColor: AppColors.primary.withAlpha(10),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.border),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                VaultItemAvatar(title: item.title),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: const TextStyle(
+                          color: AppColors.onSurface,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    );
-                  },
+                      const SizedBox(height: 3),
+                      const Text(
+                        'Dados protegidos',
+                        style: TextStyle(
+                          color: AppColors.muted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _goToAddItem,
-        child: const Icon(Icons.add),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.subtle,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

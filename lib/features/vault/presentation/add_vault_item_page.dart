@@ -5,6 +5,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/crypto/crypto_service.dart';
+import '../../../shared/widgets/cofry_widgets.dart';
+import '../../../theme/app_theme.dart';
 import '../data/vault_memory_repository.dart';
 import '../domain/decrypted_vault_item.dart';
 import '../domain/vault_item.dart';
@@ -87,8 +89,12 @@ class _AddVaultItemPageState extends State<AddVaultItemPage> {
       final decryptedItem = DecryptedVaultItem(
         username: _usernameController.text.trim(),
         password: _passwordController.text.trim(),
-        url: _urlController.text.trim().isEmpty ? null : _urlController.text.trim(),
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+        url: _urlController.text.trim().isEmpty
+            ? null
+            : _urlController.text.trim(),
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
       );
 
       final jsonPayload = jsonEncode(decryptedItem.toMap());
@@ -115,13 +121,12 @@ class _AddVaultItemPageState extends State<AddVaultItemPage> {
       if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao salvar item: $e')),
       );
     } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -139,74 +144,118 @@ class _AddVaultItemPageState extends State<AddVaultItemPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(isEditing ? 'Editar item' : 'Novo item'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: AppColors.border),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: ListView(
-              children: [
-                TextField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Título',
-                    border: OutlineInputBorder(),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 540),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 40),
+            children: [
+              _FormSection(
+                label: 'Identificação',
+                children: [
+                  CofryTextField(
+                    controller: _titleController,
+                    label: 'Título',
+                    prefixIcon: Icons.label_outline_rounded,
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Usuário / Email',
-                    border: OutlineInputBorder(),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _FormSection(
+                label: 'Credenciais',
+                children: [
+                  CofryTextField(
+                    controller: _usernameController,
+                    label: 'Usuário / Email',
+                    prefixIcon: Icons.person_outline_rounded,
+                    keyboardType: TextInputType.emailAddress,
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 14),
+                  CofryTextField(
+                    controller: _passwordController,
+                    label: 'Senha',
+                    prefixIcon: Icons.lock_outline_rounded,
+                    obscure: true,
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _urlController,
-                  decoration: const InputDecoration(
-                    labelText: 'URL',
-                    border: OutlineInputBorder(),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _FormSection(
+                label: 'Detalhes opcionais',
+                children: [
+                  CofryTextField(
+                    controller: _urlController,
+                    label: 'URL',
+                    prefixIcon: Icons.link_rounded,
+                    keyboardType: TextInputType.url,
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _notesController,
-                  maxLines: 4,
-                  decoration: const InputDecoration(
-                    labelText: 'Notas',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 14),
+                  CofryTextField(
+                    controller: _notesController,
+                    label: 'Notas',
+                    prefixIcon: Icons.notes_rounded,
+                    maxLines: 4,
                   ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _loading ? null : _saveItem,
-                    child: Text(
-                      _loading
-                          ? 'Salvando...'
-                          : isEditing
-                              ? 'Salvar alterações'
-                              : 'Salvar',
-                    ),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              PrimaryButton(
+                label: isEditing ? 'Salvar alterações' : 'Salvar item',
+                loading: _loading,
+                onPressed: _saveItem,
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FormSection extends StatelessWidget {
+  final String label;
+  final List<Widget> children;
+
+  const _FormSection({required this.label, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: children,
+          ),
+        ),
+      ],
     );
   }
 }

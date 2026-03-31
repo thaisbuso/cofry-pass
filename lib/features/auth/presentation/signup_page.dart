@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../shared/widgets/cofry_widgets.dart';
+import '../../../theme/app_theme.dart';
 import '../data/auth_service.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -38,23 +41,19 @@ class _SignUpPageState extends State<SignUpPage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Conta criada com sucesso. Verifique seu email se necessário.'),
+          content: Text(
+              'Conta criada com sucesso. Verifique seu email se necessário.'),
         ),
       );
 
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao cadastrar: $e'),
-        ),
+        SnackBar(content: Text('Erro ao cadastrar: $e')),
       );
     } finally {
-      if (mounted) {
-        setState(() => _loading = false);
-      }
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -62,42 +61,67 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Criar conta'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+          onPressed: () => Navigator.pop(context),
+          tooltip: 'Voltar',
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      body: SafeArea(
         child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
+          child: SingleChildScrollView(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const AuthHeader(
+                    title: 'Criar conta',
+                    subtitle:
+                        'Registre-se para começar a proteger suas senhas.',
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 36),
+                  CofryTextField(
+                    controller: _emailController,
+                    label: 'Email',
+                    prefixIcon: Icons.alternate_email_rounded,
+                    keyboardType: TextInputType.emailAddress,
                   ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _loading ? null : _signUp,
-                    child: Text(_loading ? 'Criando...' : 'Criar conta'),
+                  const SizedBox(height: 14),
+                  CofryTextField(
+                    controller: _passwordController,
+                    label: 'Senha',
+                    prefixIcon: Icons.lock_outline_rounded,
+                    obscure: true,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 28),
+                  PrimaryButton(
+                    label: 'Criar conta',
+                    loading: _loading,
+                    onPressed: _signUp,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Já tem uma conta?',
+                        style: TextStyle(
+                          color: AppColors.muted,
+                          fontSize: 14,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Entrar'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../../shared/widgets/cofry_widgets.dart';
+import '../../../theme/app_theme.dart';
 import '../data/auth_service.dart';
 import 'master_password_page.dart';
 import 'signup_page.dart';
@@ -37,94 +39,96 @@ class _LoginPageState extends State<LoginPage> {
       if (hasMasterPassword == 'true') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => const UnlockVaultPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const UnlockVaultPage()),
         );
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (_) => const MasterPasswordPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const MasterPasswordPage()),
         );
       }
     } catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro no login: $e')),
       );
     } finally {
-      if (mounted) {
-        setState(() => loading = false);
-      }
+      if (mounted) setState(() => loading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Entrar'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      body: SafeArea(
         child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.lock_outline, size: 72),
-                const SizedBox(height: 24),
-                const Text(
-                  'Password Vault',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+          child: SingleChildScrollView(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const AuthHeader(
+                    title: 'Cofry Pass',
+                    subtitle: 'Acesse sua conta com segurança.',
                   ),
-                ),
-                const SizedBox(height: 32),
-                TextField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 36),
+                  CofryTextField(
+                    controller: emailController,
+                    label: 'Email',
+                    prefixIcon: Icons.alternate_email_rounded,
+                    keyboardType: TextInputType.emailAddress,
                   ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 14),
+                  CofryTextField(
+                    controller: passwordController,
+                    label: 'Senha',
+                    prefixIcon: Icons.lock_outline_rounded,
+                    obscure: true,
                   ),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
+                  const SizedBox(height: 28),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: const StadiumBorder(),
+                    ),
                     onPressed: loading ? null : login,
-                    child: Text(loading ? 'Entrando...' : 'Entrar'),
+                    child: loading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Entrar'),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SignUpPage(),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Não tem uma conta?',
+                        style: TextStyle(
+                          color: AppColors.muted,
+                          fontSize: 14,
+                        ),
                       ),
-                    );
-                  },
-                  child: const Text('Criar conta'),
-                ),
-              ],
+                      TextButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const SignUpPage()),
+                        ),
+                        child: const Text('Criar conta'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
