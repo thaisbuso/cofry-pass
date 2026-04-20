@@ -42,26 +42,15 @@ class AuthLayout extends StatelessWidget {
 class AppLogoMark extends StatelessWidget {
   final double size;
 
-  const AppLogoMark({super.key, this.size = 52});
+  const AppLogoMark({super.key, this.size = 64});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Image.asset(
+      'assets/images/cofry-logo.png',
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: AppColors.primary.withAlpha(30),
-        borderRadius: BorderRadius.circular(size * 0.28),
-        border: Border.all(
-          color: AppColors.primary.withAlpha(70),
-          width: 1.5,
-        ),
-      ),
-      child: Icon(
-        Icons.shield_rounded,
-        size: size * 0.52,
-        color: AppColors.primary,
-      ),
+      fit: BoxFit.contain,
     );
   }
 }
@@ -74,16 +63,55 @@ class AuthHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
   final bool showLogo;
+  final bool horizontal;
 
   const AuthHeader({
     super.key,
     required this.title,
     this.subtitle,
     this.showLogo = true,
+    this.horizontal = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (horizontal && showLogo) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const AppLogoMark(size: 80),
+          const SizedBox(width: 14),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppColors.onSurface,
+                  fontSize: 34,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.8,
+                  height: 1.05,
+                ),
+              ),
+              if (subtitle != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  subtitle!,
+                  style: const TextStyle(
+                    color: AppColors.muted,
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -135,18 +163,52 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: loading ? null : onPressed,
-      child: loading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : Text(label),
+    final bool isEnabled = !loading && onPressed != null;
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(100),
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isEnabled
+                ? const [AppColors.primaryLight, AppColors.primary]
+                : [AppColors.primaryDim, AppColors.primaryDim],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: InkWell(
+          onTap: isEnabled ? onPressed : null,
+          borderRadius: BorderRadius.circular(100),
+          splashColor: Colors.white.withAlpha(25),
+          highlightColor: Colors.white.withAlpha(15),
+          child: SizedBox(
+            height: 52,
+            child: Center(
+              child: loading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      label,
+                      style: const TextStyle(
+                        color: AppColors.onPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -199,8 +261,9 @@ class _CofryTextFieldState extends State<CofryTextField> {
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hintText,
+        prefixIconConstraints: const BoxConstraints(minWidth: 48, minHeight: 48),
         prefixIcon: widget.prefixIcon != null
-            ? Icon(widget.prefixIcon, size: 18)
+            ? Icon(widget.prefixIcon, size: 20)
             : null,
         suffixIcon: widget.obscure
             ? IconButton(

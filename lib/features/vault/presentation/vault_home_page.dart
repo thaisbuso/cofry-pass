@@ -70,18 +70,11 @@ class _VaultHomePageState extends State<VaultHomePage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Container(
-              width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withAlpha(30),
-                borderRadius: BorderRadius.circular(7),
-              ),
-              child: const Icon(
-                Icons.shield_rounded,
-                size: 15,
-                color: AppColors.primary,
-              ),
+            Image.asset(
+              'assets/images/cofry-logo.png',
+              width: 34,
+              height: 34,
+              fit: BoxFit.contain,
             ),
             const SizedBox(width: 10),
             const Text('Cofry Pass'),

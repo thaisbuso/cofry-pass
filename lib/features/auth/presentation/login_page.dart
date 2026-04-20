@@ -74,39 +74,29 @@ class _LoginPageState extends State<LoginPage> {
                   const AuthHeader(
                     title: 'Cofry Pass',
                     subtitle: 'Acesse sua conta com segurança.',
+                    horizontal: true,
                   ),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 40),
                   CofryTextField(
                     controller: emailController,
                     label: 'Email',
                     prefixIcon: Icons.alternate_email_rounded,
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   CofryTextField(
                     controller: passwordController,
                     label: 'Senha',
                     prefixIcon: Icons.lock_outline_rounded,
                     obscure: true,
                   ),
-                  const SizedBox(height: 28),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: const StadiumBorder(),
-                    ),
-                    onPressed: loading ? null : login,
-                    child: loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text('Entrar'),
+                  const SizedBox(height: 32),
+                  PrimaryButton(
+                    label: 'Entrar',
+                    loading: loading,
+                    onPressed: login,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

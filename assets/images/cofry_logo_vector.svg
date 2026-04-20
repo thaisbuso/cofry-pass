@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#181046"/>
+      <stop offset="55%" stop-color="#120C37"/>
+      <stop offset="100%" stop-color="#0A0725"/>
+    </radialGradient>
+
+    <linearGradient id="cGrad" x1="76" y1="70" x2="180" y2="182" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C788FF"/>
+      <stop offset="45%" stop-color="#9B5CFF"/>
+      <stop offset="100%" stop-color="#6F36FF"/>
+    </linearGradient>
+
+    <linearGradient id="keyGrad" x1="112" y1="103" x2="142" y2="156" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D6AEFF"/>
+      <stop offset="100%" stop-color="#8E53FF"/>
+    </linearGradient>
+
+    <filter id="outerGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur1"/>
+      <feColorMatrix in="blur1" type="matrix"
+        values="1 0 0 0 0.46
+                0 1 0 0 0.21
+                0 0 1 0 1
+                0 0 0 1 0" result="purpleGlow"/>
+      <feBlend in="SourceGraphic" in2="purpleGlow" mode="screen"/>
+    </filter>
+
+    <filter id="softHalo" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <!-- transparent outer background -->
+  <circle cx="128" cy="128" r="101" fill="#7B3FFF" opacity="0.18" filter="url(#softHalo)"/>
+  <circle cx="128" cy="128" r="97" fill="#7C4DFF" opacity="0.10" filter="url(#softHalo)"/>
+
+  <!-- disk -->
+  <circle cx="128" cy="128" r="90" fill="url(#bgGrad)"/>
+
+  <!-- glowing ring -->
+  <circle cx="128" cy="128" r="92" stroke="#8D58FF" stroke-width="2.4" opacity="0.95" filter="url(#outerGlow)"/>
+  <circle cx="128" cy="128" r="92" stroke="#CFA8FF" stroke-width="0.8" opacity="0.55"/>
+
+  <!-- C mark -->
+  <g transform="rotate(0 128 128)">
+    <circle cx="128" cy="128" r="50" stroke="url(#cGrad)" stroke-width="28" stroke-linecap="round"
+            stroke-dasharray="234 90" transform="rotate(-48 128 128)"/>
+  </g>
+
+  <!-- keyhole silhouette -->
+  <path d="M128 110
+           C119.7 110 113 116.6 113 124.8
+           C113 131.1 117.0 136.4 122.7 138.4
+           L118.9 152.5
+           C118.4 154.2 119.7 156 121.5 156
+           H134.5
+           C136.3 156 137.6 154.2 137.1 152.5
+           L133.3 138.4
+           C139.0 136.4 143 131.1 143 124.8
+           C143 116.6 136.3 110 128 110Z"
+        fill="url(#keyGrad)"/>
+
+  <!-- subtle center shade to mimic original depth -->
+  <circle cx="128" cy="128" r="20" fill="#160F41" opacity="0.55"/>
+</svg>

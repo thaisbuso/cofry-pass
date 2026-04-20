@@ -55,9 +55,14 @@ abstract final class AppTheme {
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: AppColors.surface,
+          fillColor: WidgetStateColor.resolveWith((states) {
+            if (states.contains(WidgetState.focused)) {
+              return AppColors.surfaceElevated;
+            }
+            return AppColors.surface;
+          }),
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              const EdgeInsets.symmetric(horizontal: 18, vertical: 17),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: AppColors.border),
@@ -68,7 +73,7 @@ abstract final class AppTheme {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.8),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -76,13 +81,18 @@ abstract final class AppTheme {
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.error, width: 1.8),
           ),
           labelStyle: const TextStyle(color: AppColors.muted, fontSize: 14),
           hintStyle: const TextStyle(color: AppColors.subtle, fontSize: 14),
           floatingLabelStyle:
               const TextStyle(color: AppColors.primary, fontSize: 13),
-          prefixIconColor: AppColors.muted,
+          prefixIconColor: WidgetStateColor.resolveWith((states) {
+            if (states.contains(WidgetState.focused)) {
+              return AppColors.primary;
+            }
+            return AppColors.muted;
+          }),
           suffixIconColor: AppColors.muted,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
