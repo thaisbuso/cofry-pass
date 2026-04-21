@@ -71,7 +71,7 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Center(
           child: SingleChildScrollView(
             padding:
-                const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
@@ -82,8 +82,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     title: 'Criar conta',
                     subtitle:
                         'Registre-se para começar a proteger suas senhas.',
+                    horizontal: true,
                   ),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 40),
                   CofryTextField(
                     controller: _emailController,
                     label: 'Email',

@@ -81,32 +81,34 @@ class AuthHeader extends StatelessWidget {
         children: [
           const AppLogoMark(size: 80),
           const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.onSurface,
-                  fontSize: 34,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.8,
-                  height: 1.05,
-                ),
-              ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 Text(
-                  subtitle!,
+                  title,
                   style: const TextStyle(
-                    color: AppColors.muted,
-                    fontSize: 15,
-                    height: 1.4,
+                    color: AppColors.onSurface,
+                    fontSize: 34,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.8,
+                    height: 1.05,
                   ),
                 ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    subtitle!,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontSize: 15,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ],
       );
