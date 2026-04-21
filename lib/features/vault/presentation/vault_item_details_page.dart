@@ -1,17 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../core/crypto/crypto_service.dart';
 import '../../../shared/widgets/cofry_widgets.dart';
 import '../../../theme/app_theme.dart';
-import '../data/vault_memory_repository.dart';
 import '../domain/decrypted_vault_item.dart';
 import '../domain/vault_item.dart';
+import '../vault_providers.dart';
 import 'add_vault_item_page.dart';
 
-class VaultItemDetailsPage extends StatefulWidget {
+class VaultItemDetailsPage extends ConsumerStatefulWidget {
   final VaultItem item;
 
   const VaultItemDetailsPage({
@@ -20,11 +21,11 @@ class VaultItemDetailsPage extends StatefulWidget {
   });
 
   @override
-  State<VaultItemDetailsPage> createState() => _VaultItemDetailsPageState();
+  ConsumerState<VaultItemDetailsPage> createState() =>
+      _VaultItemDetailsPageState();
 }
 
-class _VaultItemDetailsPageState extends State<VaultItemDetailsPage> {
-  final _repository = VaultMemoryRepository();
+class _VaultItemDetailsPageState extends ConsumerState<VaultItemDetailsPage> {
   final _storage = const FlutterSecureStorage();
   final _cryptoService = CryptoService();
 
@@ -104,7 +105,8 @@ class _VaultItemDetailsPageState extends State<VaultItemDetailsPage> {
     );
 
     if (confirm == true) {
-      await _repository.deleteItem(widget.item.id);
+      final repository = ref.read(vaultRepositoryProvider);
+      await repository.deleteItem(widget.item.id);
       if (!mounted) return;
       Navigator.pop(context, true);
     }

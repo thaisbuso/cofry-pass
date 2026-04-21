@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/widgets/cofry_widgets.dart';
 import '../../../theme/app_theme.dart';
 import '../../auth/data/auth_service.dart';
 import '../../auth/presentation/login_page.dart';
-import '../data/vault_memory_repository.dart';
 import '../domain/vault_item.dart';
+import '../vault_providers.dart';
 import 'add_vault_item_page.dart';
 import 'vault_item_details_page.dart';
 
-class VaultHomePage extends StatefulWidget {
+class VaultHomePage extends ConsumerStatefulWidget {
   const VaultHomePage({super.key});
 
   @override
-  State<VaultHomePage> createState() => _VaultHomePageState();
+  ConsumerState<VaultHomePage> createState() => _VaultHomePageState();
 }
 
-class _VaultHomePageState extends State<VaultHomePage> {
-  final _repository = VaultMemoryRepository();
+class _VaultHomePageState extends ConsumerState<VaultHomePage> {
   final _authService = AuthService();
 
   List<VaultItem> items = [];
@@ -26,11 +26,19 @@ class _VaultHomePageState extends State<VaultHomePage> {
   @override
   void initState() {
     super.initState();
-    _loadItems();
+    _migrateAndLoad();
+  }
+
+  Future<void> _migrateAndLoad() async {
+    final repository = ref.read(vaultRepositoryProvider);
+    final migrationService = ref.read(vaultMigrationServiceProvider);
+    await migrationService.migrateIfNeeded(repository);
+    await _loadItems();
   }
 
   Future<void> _loadItems() async {
-    final loadedItems = await _repository.getItems();
+    final repository = ref.read(vaultRepositoryProvider);
+    final loadedItems = await repository.getItems();
     if (!mounted) return;
     setState(() {
       items = loadedItems;

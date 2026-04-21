@@ -1,33 +1,33 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/crypto/crypto_service.dart';
 import '../../../shared/widgets/cofry_widgets.dart';
 import '../../../theme/app_theme.dart';
-import '../data/vault_memory_repository.dart';
 import '../domain/decrypted_vault_item.dart';
 import '../domain/vault_item.dart';
+import '../vault_providers.dart';
 
-class AddVaultItemPage extends StatefulWidget {
+class AddVaultItemPage extends ConsumerStatefulWidget {
   final VaultItem? existingItem;
 
   const AddVaultItemPage({super.key, this.existingItem});
 
   @override
-  State<AddVaultItemPage> createState() => _AddVaultItemPageState();
+  ConsumerState<AddVaultItemPage> createState() => _AddVaultItemPageState();
 }
 
-class _AddVaultItemPageState extends State<AddVaultItemPage> {
+class _AddVaultItemPageState extends ConsumerState<AddVaultItemPage> {
   final _titleController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _urlController = TextEditingController();
   final _notesController = TextEditingController();
 
-  final _repository = VaultMemoryRepository();
   final _uuid = const Uuid();
   final _storage = const FlutterSecureStorage();
   final _cryptoService = CryptoService();
@@ -112,10 +112,11 @@ class _AddVaultItemPageState extends State<AddVaultItemPage> {
         mac: encrypted['mac']!,
       );
 
+      final repository = ref.read(vaultRepositoryProvider);
       if (isEditing) {
-        await _repository.updateItem(item);
+        await repository.updateItem(item);
       } else {
-        await _repository.addItem(item);
+        await repository.addItem(item);
       }
 
       if (!mounted) return;
